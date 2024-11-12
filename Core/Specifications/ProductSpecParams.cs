@@ -17,8 +17,6 @@ namespace Core.Specifications
             set => _pageSize = (value > MaxPageSize ? MaxPageSize: value);
         }
 
-
-
         private List<string> _brands = [];
 
 		public List<string> Brands // brnad=boards,glass
@@ -42,6 +40,18 @@ namespace Core.Specifications
                     System.StringSplitOptions.RemoveEmptyEntries)).ToList();
             }
         }
+
+        private string? _search;
+
+        public string Search
+        {
+            get => _search ?? "";
+            set 
+            {
+                _search = value.ToLower(); 
+            }
+        }
+
 
         public string? Sort { get; set; }
 
