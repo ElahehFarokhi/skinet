@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using API.RequestHelpers;
+using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,15 @@ namespace API.Controllers
     public class ProductsController(IGenericRepository<Product> productRepository) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
+        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery] ProductSpecParams specParams)
         {
-            var spec = new ProductSpecification(brand, type, sort);
-            return Ok(await productRepository.ListAsync(spec));
+            var spec = new ProductSpecification(specParams);
+            var products = await productRepository.ListAsync(spec);
+            var count = await productRepository.CountAsync(spec);
+            var pagination = new Pagination<Product>(specParams.PageIndex,
+                specParams.PageSize, count, products);
+
+            return Ok(pagination);
         }
 
         [HttpGet("{id:int}")]
@@ -31,8 +37,8 @@ namespace API.Controllers
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
             productRepository.Add(product);
-           
-            if (await productRepository.SaveAllAsync()) 
+
+            if (await productRepository.SaveAllAsync())
             {
                 return CreatedAtAction("GetProduct", new { id = product.Id }, product);
             }
@@ -43,12 +49,12 @@ namespace API.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult<Product>> UpdateProduct(int id, Product product)
         {
-            if ( id != product.Id || ! ProductExists(id)) return BadRequest("Cannot update this product");
+            if (id != product.Id || !ProductExists(id)) return BadRequest("Cannot update this product");
 
             productRepository.Update(product);
-            if (await productRepository.SaveAllAsync()) 
+            if (await productRepository.SaveAllAsync())
             {
-                return NoContent();            
+                return NoContent();
             }
 
             return BadRequest("Problem updating the product");
@@ -84,7 +90,7 @@ namespace API.Controllers
         }
 
 
-        private bool ProductExists(int id) 
+        private bool ProductExists(int id)
         {
             return productRepository.Exists(id);
         }
