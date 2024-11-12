@@ -12,7 +12,7 @@ namespace Core.Interfaces
         Task<Product?> GetProductByIdAsync(int id);
         Task<IReadOnlyList<string>> GetBrandsAsync();
         Task<IReadOnlyList<string>> GetTypesAsync();
-        Task<IReadOnlyList<Product>> GetProductsAsync(string? brand, string? type);
+        Task<IReadOnlyList<Product>> GetProductsAsync(string? brand, string? type, string? sort);
         void AddProduct(Product product);
         void UpdateProduct(Product product);
         void DeleteProduct(Product product);
