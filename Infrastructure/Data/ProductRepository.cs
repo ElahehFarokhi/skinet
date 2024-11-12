@@ -17,14 +17,39 @@ namespace Infrastructure.Data
 
         }
 
+        public async Task<IReadOnlyList<string>> GetBrandsAsync()
+        {
+            return await context.Products.Select(x => x.Brand)
+                .Distinct()
+                .ToListAsync();
+        }
+
         public async Task<Product?> GetProductByIdAsync(int id)
         {
             return await context.Products.FindAsync(id);
         }
 
-        public async Task<IReadOnlyList<Product>> GetProductsAsync()
+        public async Task<IReadOnlyList<Product>> GetProductsAsync(string? brand, string? type)
         {
-            return await context.Products.ToListAsync();
+            var query = context.Products.AsQueryable();
+            if (! string.IsNullOrWhiteSpace(brand))
+            {
+                query.Where(x => x.Brand.Equals(brand,StringComparison.CurrentCultureIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(type))
+            {
+                query.Where(x => x.Type.Equals(type, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            return await query
+                .ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<string>> GetTypesAsync()
+        {
+            return await context.Products.Select(x => x.Type)
+                .Distinct()
+                .ToListAsync();
         }
 
         public bool ProductExists(int id)
