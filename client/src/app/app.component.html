@@ -1,2 +1,5 @@
 <app-header></app-header>
 <h2 class="text-3xl font-bold underline">Welcome to {{title}}</h2>
+@for (product of products; track product.id) {
+ <li>{{product.name}}</li>
+}
