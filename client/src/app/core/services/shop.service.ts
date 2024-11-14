@@ -14,6 +14,12 @@ export class ShopService {
   types:string[]=[]
   brands:string[]=[]
 
+  getProduct(id: number) {
+    return this.http.get<Product>(
+      this.baseUrl + `products/${id}`
+    );
+  }
+
   getProducts(shopParams: ShopParams) {
     let params= new HttpParams();
     if (shopParams.brands.length > 0) {
