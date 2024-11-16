@@ -3,6 +3,7 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.SeedData;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,15 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddCors();
+builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Redis")
+    ?? throw new Exception("Cannot get Redis connection string");
+
+    var configuration = ConfigurationOptions.Parse(connectionString, true);
+    return ConnectionMultiplexer.Connect(configuration);
+
+});
 
 var app = builder.Build();
 
@@ -24,9 +34,9 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseCors(x=>x.AllowAnyHeader()
+app.UseCors(x => x.AllowAnyHeader()
 .AllowAnyMethod()
-.WithOrigins("http://localhost:4200","https://localhost:4200"));
+.WithOrigins("http://localhost:4200", "https://localhost:4200"));
 
 app.MapControllers();
 
@@ -41,6 +51,6 @@ try
 catch (Exception ex)
 {
     Console.WriteLine(ex);
-	throw;
+    throw;
 }
 app.Run();
