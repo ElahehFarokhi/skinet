@@ -1,0 +1,27 @@
+<div class="container mt-5 bg-gray-100 rounded shadow-lg">
+  <h1 class="text-2xl font-semibold mb-4">Internal Server</h1>
+  @if (error) {
+    <h5 class="text-red-600">error: {{error.message}}</h5>
+    <p class="font-bold mb-2">
+      This error comes from server! Not Angular!!!
+    </p>
+    <p class="mb-2">What to do next?</p>
+    <ol class="list-decimal ml-5 mb-4">
+      <li class="mb-1">
+        Check the network tab in Chrome dev tools.
+      </li>
+      <li class="mb-1">
+        Reproduce the error in Postman.
+        If same error, don't waste time troubleshooting Angular core.
+      </li>
+    </ol>
+    <h5 class="text-lg font-semibold mb-2">
+      Stack Trace
+    </h5>
+    <mat-card class="p-4 bg-white">
+      <code class="block whitespace-pre-wrap">
+        {{error.detail}}
+      </code>
+    </mat-card>
+  }
+</div>

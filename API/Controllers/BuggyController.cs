@@ -1,62 +1,67 @@
-﻿using API.DTOs;
-using API.Errors;
-using Infrastructure.Data;
+﻿using System.Security.Claims;
+using API.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace API.Controllers;
+
+public class BuggyController : BaseApiController
 {
-    public class BuggyController : BaseApiController
+    [HttpGet("unauthorized")]
+    public IActionResult GetUnauthorized()
     {
-        private readonly StoreContext _context;
-        public BuggyController(StoreContext context)
+        return Unauthorized();
+    }
+
+    [HttpGet("badrequest")]
+    public IActionResult GetBadRequest()
+    {
+        return BadRequest("Not a good request");
+    }
+
+    [HttpGet("notfound")]
+    public IActionResult GetNotFound()
+    {
+        return NotFound();
+    }
+
+    [HttpGet("internalerror")]
+    public IActionResult GetInternalError()
+    {
+        throw new Exception("This is a test exception");
+    }
+
+    [HttpPost("validationerror")]
+    public IActionResult GetValidationError(CreateProductDto product)
+    {
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpGet("secret")]
+    public IActionResult GetSecret()
+    {
+        var name = User.FindFirst(ClaimTypes.Name)?.Value;
+        var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        return Ok("Hello " + name + " with the id of " + id);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin-secret")]
+    public IActionResult GetAdminSecret()
+    {
+        var name = User.FindFirst(ClaimTypes.Name)?.Value;
+        var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var isAdmin = User.IsInRole("Admin");
+        var roles = User.FindFirstValue(ClaimTypes.Role);
+
+        return Ok(new
         {
-            _context = context;
-        }
-
-        [HttpGet("testauth")]
-        [Authorize]
-        public ActionResult<string> GetSecretText()
-        {
-            return "secret stuff";
-        }
-
-        [HttpGet("notfound")]
-        public ActionResult GetNotFoundRequest()
-        {
-            var thing = _context.Products.Find(42);
-
-            if (thing == null) return NotFound(new ApiResponse(404));
-
-            return Ok();
-        }
-
-        [HttpGet("servererror")]
-        public ActionResult GetServerError()
-        {
-            var thing = _context.Products.Find(42);
-
-            var thingToReturn = thing.ToString();
-
-            return Ok();
-        }
-
-        [HttpPost("validationerror")]
-        public IActionResult GetValidationError(CreateProductDto dto)
-        {
-            return Ok();
-        }
-
-        [HttpGet("badrequest")]
-        public ActionResult GetBadRequest()
-        {
-            return BadRequest(new ApiResponse(400));
-        }
-
-        [HttpGet("badrequest/{id}")]
-        public ActionResult GetNotFoundRequest(int id)
-        {
-            return Ok();
-        }
+            name,
+            id,
+            isAdmin,
+            roles
+        });
     }
 }

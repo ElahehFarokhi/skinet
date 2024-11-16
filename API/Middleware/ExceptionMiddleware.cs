@@ -29,7 +29,7 @@ namespace API.Middleware
                 : new ApiErrorResponse(context.Response.StatusCode, ex.Message, "Internal server error.");
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-            var json = JsonSerializer.Serialize(response);
+            var json = JsonSerializer.Serialize(response, options);
             await context.Response.WriteAsync(json);
         }
     }
