@@ -15,7 +15,7 @@ export class CartService {
   cart = signal<Cart | null>(null);
 
   getCart(id: string) {
-    this.http.get<Cart>(this.baseUrl + 'cart?id=' + id).pipe(
+    return this.http.get<Cart>(this.baseUrl + 'cart?id=' + id).pipe(
       map(cart => {
         this.cart.set(cart);
       })
