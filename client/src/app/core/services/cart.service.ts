@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Cart, CartItem } from '../../shared/models/cart';
@@ -13,10 +13,29 @@ export class CartService {
   private http = inject(HttpClient);
 
   cart = signal<Cart | null>(null);
+  itemCount = computed(() =>
+    this.cart()?.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
+  totals = computed(() => {
+    const cart = this.cart();
+    if (!cart) return null;
 
+    const subTotal = cart.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    const shipping = 0;
+    const discount = 0;
+    return {
+      subTotal,
+      shipping,
+      discount,
+      total: subTotal + shipping - discount,
+    };
+  });
   getCart(id: string) {
     return this.http.get<Cart>(this.baseUrl + 'cart?id=' + id).pipe(
-      map(cart => {
+      map((cart) => {
         this.cart.set(cart);
       })
     );
@@ -35,6 +54,34 @@ export class CartService {
     }
     cart.items = this.addOrUpdateItems(cart.items, item, quantity);
     this.setCart(cart);
+  }
+
+  removeItemFromCart(productId: number, quantity = 1) {
+    debugger
+    const cart = this.cart();
+    if (!cart) return;
+    const index = cart.items.findIndex(x => x.productId === productId);
+    if (index !== -1) {
+      if (cart.items[index].quantity > quantity) {
+        cart.items[index].quantity -= quantity;
+      } else {
+        cart.items.splice(index, 1);
+      }
+      if (cart.items.length === 0) {
+        this.deleteCart();
+      } else {
+        this.setCart(cart);
+      }
+    }
+  }
+
+  deleteCart() {
+    this.http
+      .delete(this.baseUrl + 'cart?id=' + this.cart()?.id)
+      .subscribe(() => {
+        localStorage.removeItem('cart-id');
+        this.cart.set(null);
+      });
   }
 
   addOrUpdateItems(
