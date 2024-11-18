@@ -17,6 +17,17 @@ namespace Infrastructure.Data.SeedData
                 context.Products.AddRange(products);
                 await context.SaveChangesAsync();
             }
+
+            if (!context.DeliveryMethods.Any())
+            {
+                var deliveryMethodData = await File.ReadAllTextAsync("../Infrastructure/Data/SeedData/delivery.json");
+                var deliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryMethodData);
+                if (deliveryMethods is null) return;
+
+                context.DeliveryMethods.AddRange(deliveryMethods);
+                await context.SaveChangesAsync();
+            }
+
         }
     }
 }
