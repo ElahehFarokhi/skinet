@@ -1,8 +1,6 @@
 <div class="flex mt-32 gap-6">
   <div class="w-3/4">
-    <mat-stepper #stepper class="bg-white border border-gray-200 shadow-sm"
-    (selectionChange)="onStepChange($event)"
-    >
+    <mat-stepper #stepper class="bg-white border border-gray-200 shadow-sm" (selectionChange)="onStepChange($event)">
       <mat-step label="Address">
         <div id="address-element"></div>
         <div class="flex justify-end mt-1">
@@ -10,12 +8,12 @@
             address</mat-checkbox>
         </div>
         <div class="flex justify-between mt-6">
-          <button routerLink="/shop" mat-stroked-button>Continue shopping</button>
-          <button matStepperNext mat-flat-button>Next</button>
+          <button class="z-0" routerLink="/shop" mat-stroked-button>Continue shopping</button>
+          <button class="z-0" matStepperNext mat-flat-button>Next</button>
         </div>
       </mat-step>
       <mat-step label="Shipping">
-        <app-checkout-delivery></app-checkout-delivery>
+        <app-checkout-delivery (deliveryComplete)="handleDeliveryChange($event)"></app-checkout-delivery>
         <div class="flex justify-between mt-6">
           <button matStepperPrevious mat-stroked-button>Back</button>
           <button matStepperNext mat-flat-button>Next</button>
@@ -38,6 +36,7 @@
         </div>
       </mat-step>
     </mat-stepper>
+    <pre>{{completionStatus() | json}}</pre>
   </div>
   <div class="w-1/4">
     <app-order-summary></app-order-summary>
