@@ -2,9 +2,9 @@
   <h4 class="text-lg font-semibold">Billing and delivery information</h4>
   <dl>
     <dt class="font-medium">Shipping address</dt>
-    <dd class="mt-1 text-gray-500">Shipping address goes here</dd>
+    <dd class="mt-1 text-gray-500">{{confirmationToken?.shipping | address}}</dd>
     <dt class="font-medium">Payment details</dt>
-    <dd class="mt-1 text-gray-500">Payment details goes here</dd>
+    <dd class="mt-1 text-gray-500">{{confirmationToken?.payment_method_preview | paymentCard}}</dd>
   </dl>
 </div>
 <div class="mt-6 mx-auto">
@@ -15,8 +15,7 @@
         <tr>
           <td class="py-4">
             <div class="flex items-center gap-4">
-              <img src="{{product.pictureUrl}}" alt="product image"
-              class="w-10 h-10">
+              <img src="{{product.pictureUrl}}" alt="product image" class="w-10 h-10">
               <span>{{product.productName}}</span>
             </div>
           </td>

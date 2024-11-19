@@ -1,13 +1,15 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { MatStepperModule } from '@angular/material/stepper';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatButton } from '@angular/material/button';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import {
   MatCheckboxChange,
   MatCheckboxModule,
 } from '@angular/material/checkbox';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { StripeService } from '../../core/services/stripe.service';
 import {
+  ConfirmationToken,
   StripeAddressElement,
   StripeAddressElementChangeEvent,
   StripePaymentElement,
@@ -37,6 +39,7 @@ import { CurrencyPipe, JsonPipe } from '@angular/common';
     CheckoutReviewComponent,
     CurrencyPipe,
     JsonPipe,
+    MatProgressSpinner
   ],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss',
@@ -45,6 +48,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   private stripeService = inject(StripeService);
   private accountService = inject(AccountService);
   private snackbar = inject(SnackbarService);
+  private router = inject(Router);
   cartService = inject(CartService);
   addressElement?: StripeAddressElement;
   paymentElements?: StripePaymentElement;
@@ -54,6 +58,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     card: Boolean;
     delivery: Boolean;
   }>({ address: false, card: false, delivery: false });
+
+  confirmationToken?: ConfirmationToken;
+  loading = false;
 
   async ngOnInit() {
     try {
@@ -90,6 +97,25 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
+  async getInformationToken() {
+    try {
+      if (
+        Object.values(this.completionStatus()).every(
+          (status) => status === true
+        )
+      ) {
+        const result = await this.stripeService.createConfirmationToken();
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+        this.confirmationToken = result.confirmationToken;
+        console.log('confirmation token ====>', this.confirmationToken);
+      }
+    } catch (error: any) {
+      this.snackbar.error(error.message);
+    }
+  }
+
   async onStepChange(event: StepperSelectionEvent) {
     if (event.selectedIndex === 1) {
       if (this.saveAddress) {
@@ -99,6 +125,31 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
     if (event.selectedIndex === 2) {
       await firstValueFrom(this.stripeService.createOrUpdatePaymentIntent());
+    }
+    if (event.selectedIndex === 3) {
+      await this.getInformationToken();
+    }
+  }
+
+  async confirmPayment(stepper: MatStepper) {
+    this.loading = true;
+    try {
+      if (this.confirmationToken) {
+        const result = await this.stripeService.confirmPayment(
+          this.confirmationToken
+        );
+        if (result.error) {
+          throw new Error(result.error.message);
+        } else {
+          this.cartService.deleteCart();
+          this.router.navigateByUrl('/checkout/success');
+        }
+      }
+    } catch (error: any) {
+      this.snackbar.error(error.message || 'Something went wrong');
+      stepper.previous();
+    } finally {
+      this.loading = false;
     }
   }
 
@@ -124,5 +175,4 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.stripeService.disposeElements();
   }
-
 }

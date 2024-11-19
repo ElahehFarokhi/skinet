@@ -11,13 +11,23 @@ import { RegisterComponent } from './features/account/register/register.componen
 import { LoginComponent } from './features/account/login/login.component';
 import { authGuard } from './core/guards/auth.guard';
 import { emptyCartGuard } from './core/guards/empty-cart.guard';
+import { CheckoutSuccessComponent } from './features/checkout/checkout-success/checkout-success.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'shop', component: ShopComponent },
   { path: 'shop/:id', component: ProductDetailsComponent },
   { path: 'cart', component: CartComponent },
-  { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard, emptyCartGuard] },
+  {
+    path: 'checkout',
+    component: CheckoutComponent,
+    canActivate: [authGuard, emptyCartGuard],
+  },
+  {
+    path: 'checkout/success',
+    component: CheckoutSuccessComponent,
+    canActivate: [authGuard],
+  },
   { path: 'account/login', component: LoginComponent },
   { path: 'account/register', component: RegisterComponent },
   { path: 'test-error', component: TestErrorComponent },
