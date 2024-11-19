@@ -10,22 +10,32 @@
             address</mat-checkbox>
         </div>
         <div class="flex justify-between mt-6">
-          <button routerLink="/shop" mat-stroke-button>Continue shopping</button>
+          <button routerLink="/shop" mat-stroked-button>Continue shopping</button>
           <button matStepperNext mat-flat-button>Next</button>
         </div>
       </mat-step>
       <mat-step label="Shipping">
         <app-checkout-delivery></app-checkout-delivery>
         <div class="flex justify-between mt-6">
-          <button matStepperPrevious mat-stroke-button>Back</button>
+          <button matStepperPrevious mat-stroked-button>Back</button>
           <button matStepperNext mat-flat-button>Next</button>
         </div>
       </mat-step>
       <mat-step label="Payment">
-        Payment form
+        <div id="payment-element">
+
+        </div>
+        <div class="flex justify-between mt-6">
+          <button matStepperPrevious mat-stroked-button>Back</button>
+          <button matStepperNext mat-flat-button>Next</button>
+        </div>
       </mat-step>
       <mat-step label="Confirmartion">
-        Review
+        <app-checkout-review></app-checkout-review>
+        <div class="flex justify-between mt-6">
+          <button matStepperPrevious mat-stroked-button>Back</button>
+          <button matStepperNext mat-flat-button>Pay {{cartService.totals()?.total | currency}}</button>
+        </div>
       </mat-step>
     </mat-stepper>
   </div>

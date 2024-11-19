@@ -1,0 +1,30 @@
+<div class="mt-4 w-full">
+  <h4 class="text-lg font-semibold">Billing and delivery information</h4>
+  <dl>
+    <dt class="font-medium">Shipping address</dt>
+    <dd class="mt-1 text-gray-500">Shipping address goes here</dd>
+    <dt class="font-medium">Payment details</dt>
+    <dd class="mt-1 text-gray-500">Payment details goes here</dd>
+  </dl>
+</div>
+<div class="mt-6 mx-auto">
+  <div class="border-b border-gray-200">
+    <table class="w-full text-center">
+      <tbody class="divide-y divide-gray-200">
+        @for (product of cartService.cart()?.items; track product.productId) {
+        <tr>
+          <td class="py-4">
+            <div class="flex items-center gap-4">
+              <img src="{{product.pictureUrl}}" alt="product image"
+              class="w-10 h-10">
+              <span>{{product.productName}}</span>
+            </div>
+          </td>
+          <td class="p-4">x{{product.quantity}}</td>
+          <td class="p-4 text-right">{{product.price | currency}}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
