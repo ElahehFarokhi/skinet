@@ -7,7 +7,9 @@ using ProductEntity = Core.Entities.Product;
 
 namespace Infrastructure.Services
 {
-    public class PaymentService(IConfiguration config, ICartService cartService, IGenericRepository<ProductEntity> productRepo, IGenericRepository<DeliveryMethod> dmRepository) : IPaymentService
+    public class PaymentService(IConfiguration config,
+        ICartService cartService,
+        IUnitOfWork uow) : IPaymentService
     {
         public async Task<ShoppingCart?> CreateOrUpdatePaymentIntent(string cardId)
         {
@@ -18,14 +20,14 @@ namespace Infrastructure.Services
 
             if (cart.DeliveryMethodId.HasValue)
             {
-                var deliveryMethod = await dmRepository.GetByIdAsync((int)cart.DeliveryMethodId);
+                var deliveryMethod = await uow.Repository<DeliveryMethod>().GetByIdAsync((int)cart.DeliveryMethodId);
                 if (deliveryMethod is null) return null;
                 shippingPrice = deliveryMethod.Price;
             }
 
             foreach (var item in cart.Items)
             {
-                var productItem = await productRepo.GetByIdAsync(item.ProductId);
+                var productItem = await uow.Repository<ProductEntity>().GetByIdAsync(item.ProductId);
                 if (productItem is null) return null;
                 item.Price = productItem.Price;
             }
@@ -46,7 +48,7 @@ namespace Infrastructure.Services
                 cart.PaymentIntentId = intent.Id;
                 cart.ClientSecret = intent.ClientSecret;
             }
-            else 
+            else
             {
                 var options = new PaymentIntentUpdateOptions
                 {

@@ -1,5 +1,6 @@
 ﻿using Core.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -22,6 +23,10 @@ namespace Core.Specifications
 
         public bool IsPagingEnabled { get; private set; }
 
+        public List<Expression<Func<T, object>>> Includes { get; } = [];
+
+        public List<string> IncludeStrings { get; } = [];
+
         public IQueryable<T> ApplyCriteria(IQueryable<T> query)
         {
             if (Criteria != null)
@@ -31,12 +36,22 @@ namespace Core.Specifications
             return query;
         }
 
+        protected void AddInclude(Expression<Func<T, object>> includeExpressions)
+        {
+            Includes.Add(includeExpressions);
+        }
+
+        protected void AddInclude(string includeString)
+        {
+            IncludeStrings.Add(includeString); // For ThenInclude
+        }
+
         protected void AddOrderBy(Expression<Func<T, object>> orderByExpression) 
         {
             OrderBy = orderByExpression;
         }
 
-        protected void AddOrderByDesc(Expression<Func<T, object>> orderByDescExpression)
+        protected void AddOrderByDescending(Expression<Func<T, object>> orderByDescExpression)
         {
             OrderByDescending = orderByDescExpression;
         }
@@ -52,8 +67,6 @@ namespace Core.Specifications
             Take = take;
             IsPagingEnabled = true;
         }
-
-
     }
 
     public class BaseSpecification<T,TResult>(Expression<Func<T, bool>> criteria) 
