@@ -1,8 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { Order } from '@stripe/stripe-js';
-import { OrderToCreate } from '../../shared/models/order';
+import { Order, OrderToCreate } from '../../shared/models/order';
 
 @Injectable({
   providedIn: 'root'
