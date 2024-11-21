@@ -14,9 +14,12 @@ import { Order } from '../../../shared/models/order';
   standalone: true,
   imports: [
     MatCardModule,
+    MatButton,
     DatePipe,
     CurrencyPipe,
     AddressPipe,
+    PaymentCardPipe,
+    RouterLink
   ],
   templateUrl: './order-detailed.component.html',
   styleUrl: './order-detailed.component.scss',

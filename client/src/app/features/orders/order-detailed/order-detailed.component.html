@@ -1,7 +1,10 @@
 @if (order) {
   <mat-card class="bg-white py-8 shadow-md max-w-screen-lg mx-auto">
       <div class="px-4 w-full">
-        <h2 class="text-2xl text-center font-semibold">Order summary for order #{{order.id}}</h2>
+        <div class="flex justify-between items-center align-middle">
+          <h2 class="text-2xl text-center font-semibold">Order summary for order #{{order.id}}</h2>
+          <button routerLink="/orders" mat-stroked-button>Return to orders</button>
+      </div>
           <div class="mt-8 py-3 border-t border-gray-200 flex gap-16">
               <div class="space-y-2">
                   <h4 class="text-lg font-semibold">Billing and delivery information</h4>
@@ -11,7 +14,7 @@
                   </dl>
                   <dl>
                       <dt class="font-medium">Payment info</dt>
-                      <dd class="mt-1 font-light">Payment info goes here</dd>
+                      <dd class="mt-1 font-light">{{order.paymentSummary | paymentCard}}</dd>
                   </dl>
               </div>
               <div class="space-y-2">
