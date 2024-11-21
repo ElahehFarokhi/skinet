@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment.development';
   providedIn: 'root',
 })
 export class ShopService {
-  baseUrl = environment.baseUrl;
+  baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
 
   types:string[]=[]

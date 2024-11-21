@@ -8,7 +8,7 @@ import { map, of } from 'rxjs';
   providedIn: 'root',
 })
 export class CheckoutService {
-  baseUrl = environment.baseUrl;
+  baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   deliveryMethods: DeliveryMethod[] = [];
   constructor() {}

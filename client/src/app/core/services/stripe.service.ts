@@ -18,7 +18,7 @@ import { AccountService } from './account.service';
   providedIn: 'root',
 })
 export class StripeService {
-  baseUrl = environment.baseUrl;
+  baseUrl = environment.apiUrl;
   private cartService = inject(CartService);
   private accountService = inject(AccountService);
   private http = inject(HttpClient);

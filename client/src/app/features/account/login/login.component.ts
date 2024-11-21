@@ -21,7 +21,6 @@ export class LoginComponent {
   returnUrl = '/shop';
 
 constructor(){
-  debugger
   const url = this.activatedRoute.snapshot.queryParams['returnUrl'];
   if (url) {
     this.returnUrl = url;

@@ -10,7 +10,7 @@ import { DeliveryMethod } from '../../shared/models/deliveryMethod';
   providedIn: 'root',
 })
 export class CartService {
-  baseUrl = environment.baseUrl;
+  baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
 
   cart = signal<Cart | null>(null);
