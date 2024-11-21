@@ -133,34 +133,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  async confirmPayment1(stepper: MatStepper) {
-    this.loading = true;
-    try {
-      if (this.confirmationToken) {
-        const result = await this.stripeService.confirmPayment(
-          this.confirmationToken
-        );
-        if (result.error) {
-          throw new Error(result.error.message);
-        } else {
-          this.cartService.deleteCart();
-          this.router.navigateByUrl('/checkout/success');
-        }
-      }
-    } catch (error: any) {
-      this.snackbar.error(error.message || 'Something went wrong');
-      stepper.previous();
-    } finally {
-      this.loading = false;
-    }
-  }
-
   async confirmPayment(stepper: MatStepper) {
     this.loading = true;
     try {
       if (this.confirmationToken) {
         const result = await this.stripeService.confirmPayment(this.confirmationToken);
-debugger
         if (result.paymentIntent?.status === 'succeeded') {
           const order = await this.createOrderModel();
           const orderResult = await firstValueFrom(this.orderService.createOrder(order));
