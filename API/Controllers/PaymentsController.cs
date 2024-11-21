@@ -1,15 +1,21 @@
-﻿using Core.Entities;
+﻿using API.Extensions;
+using API.SignalR;
+using Core.Entities;
 using Core.Entities.OrderAggregate;
 using Core.Interfaces;
 using Core.Specifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
 using Stripe;
 
 namespace API.Controllers
 {
     public class PaymentsController(IPaymentService paymentService,
-        IUnitOfWork uow, ILogger<PaymentsController> logger) : BaseApiController
+        IUnitOfWork uow,
+        ILogger<PaymentsController> logger,
+        IHubContext<NotificationHub> hubContext) : BaseApiController
     {
         private readonly string _whSecret = "";
 
@@ -30,9 +36,34 @@ namespace API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("webhook")]
-        public async Task<ActionResult> StripeWebhook()
+        [HttpPost("webhook/{intentId}")]
+        public async Task<ActionResult> StripeWebhook(string intentId = "")
         {
+            if (!intentId.IsNullOrEmpty())
+            {
+                //This is done manually to check if client will receive our notif
+                //because due to Iran restrictions from Stripe, it has a lot of difficulties 
+                //for me to configure stripe cli and login properly
+
+                var spec = new OrderSpecification(intentId, true);
+
+                var order = await uow.Repository<Order>().GetEntityWithSpec(spec)
+                        ?? throw new Exception("Order not found");
+
+                order.Status = OrderStatus.PaymentReceived;
+                await uow.Complete();
+
+                var connectionId =  NotificationHub.GetConnectionIdByEmail(order.BuyerEmail);
+                if (!connectionId.IsNullOrEmpty())
+                {
+                    await hubContext.Clients.Client(connectionId)
+                 .SendAsync("OrderCompleteNotification", order.ToDto());
+                }
+
+                return Ok("Update successfully.");
+
+            }
+
             var json = await new StreamReader(Request.Body).ReadToEndAsync();
             try
             {
