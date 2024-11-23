@@ -3,7 +3,7 @@ import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Cart, CartItem } from '../../shared/models/cart';
 import { Product } from '../../shared/models/product';
-import { map } from 'rxjs';
+import { firstValueFrom, map, tap } from 'rxjs';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
 
 @Injectable({
@@ -14,10 +14,13 @@ export class CartService {
   private http = inject(HttpClient);
 
   cart = signal<Cart | null>(null);
+
   itemCount = computed(() =>
     this.cart()?.items.reduce((sum, item) => sum + item.quantity, 0)
   );
+
   selectedDelivery = signal<DeliveryMethod | null>(null);
+
   totals = computed(() => {
     const cart = this.cart();
     const delivery = this.selectedDelivery();
@@ -38,6 +41,7 @@ export class CartService {
       total: subTotal + shipping - discount,
     };
   });
+
   getCart(id: string) {
     return this.http.get<Cart>(this.baseUrl + 'cart?id=' + id).pipe(
       map((cart) => {
@@ -47,21 +51,23 @@ export class CartService {
   }
 
   setCart(cart: Cart) {
-    this.http.post<Cart>(this.baseUrl + 'cart', cart).subscribe({
-      next: (cart) => this.cart.set(cart),
-    });
+    return this.http.post<Cart>(this.baseUrl + 'cart', cart).pipe(
+      tap((cart) =>{
+        this.cart.set(cart)
+      })
+    );
   }
 
-  addItemToCart(item: CartItem | Product, quantity = 1) {
+  async addItemToCart(item: CartItem | Product, quantity = 1) {
     const cart = this.cart() ?? this.createCard();
     if (this.isProduct(item)) {
       item = this.mapProductToCartItem(item);
     }
     cart.items = this.addOrUpdateItems(cart.items, item, quantity);
-    this.setCart(cart);
+    await firstValueFrom(this.setCart(cart));
   }
 
-  removeItemFromCart(productId: number, quantity = 1) {
+  async removeItemFromCart(productId: number, quantity = 1) {
     const cart = this.cart();
     if (!cart) return;
     const index = cart.items.findIndex(x => x.productId === productId);
@@ -74,7 +80,7 @@ export class CartService {
       if (cart.items.length === 0) {
         this.deleteCart();
       } else {
-        this.setCart(cart);
+        await firstValueFrom(this.setCart(cart));
       }
     }
   }
@@ -125,4 +131,5 @@ export class CartService {
     localStorage.setItem('cart_id', cart.id);
     return cart;
   }
+
 }
