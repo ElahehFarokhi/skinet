@@ -8,7 +8,7 @@ import { BusyService } from '../../core/services/busy.service';
 import { CartService } from '../../core/services/cart.service';
 import { AccountService } from '../../core/services/account.service';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
-import { MatDivider } from '@angular/material/divider';
+import { IsAdminDirective } from '../../shared/directives/is-admin.directive';
 
 @Component({
   selector: 'app-header',
@@ -22,8 +22,8 @@ import { MatDivider } from '@angular/material/divider';
     MatProgressBar,
     MatMenu,
     MatMenuTrigger,
-    MatDivider,
-    MatMenuItem
+    MatMenuItem,
+    IsAdminDirective
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
