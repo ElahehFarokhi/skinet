@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import {
   MatLabel,
@@ -12,10 +11,10 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterLink } from '@angular/router';
-import { Order } from '../../../shared/models/order';
-import { AdminService } from '../../../core/services/admin.service';
-import { OrderParams } from '../../../shared/models/orderParams';
-import { DialogService } from '../../../core/services/dialog.service';
+import { AdminService } from '../../core/services/admin.service';
+import { DialogService } from '../../core/services/dialog.service';
+import { OrderParams } from '../../shared/models/orderParams';
+import { Order } from '../../shared/models/order';
 
 @Component({
   selector: 'app-admin',

@@ -42,6 +42,8 @@ builder.Services.AddIdentityApiEndpoints<AppUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<StoreContext>();
 
+builder.Services.AddSingleton<IResponseCacheService, ResponseCacheService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

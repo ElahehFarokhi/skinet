@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using API.RequestHelpers;
+using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,7 @@ namespace API.Controllers
 {
     public class ProductsController(IUnitOfWork uow) : BaseApiController
     {
+        [Cache(600)]
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery] ProductSpecParams specParams)
         {
@@ -26,6 +28,7 @@ namespace API.Controllers
             return product;
         }
 
+        [InvalidateCache("api/products|")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
@@ -40,6 +43,7 @@ namespace API.Controllers
             return BadRequest("Problem creating product.");
         }
 
+        [InvalidateCache("api/products|")]
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<ActionResult<Product>> UpdateProduct(int id, Product product)
@@ -55,6 +59,7 @@ namespace API.Controllers
             return BadRequest("Problem updating the product");
         }
 
+        [InvalidateCache("api/products|")]
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteProduct(int id)
@@ -70,6 +75,7 @@ namespace API.Controllers
             return BadRequest("Problem deleting the product");
         }
 
+        [Cache(10000)]
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
         {
@@ -77,6 +83,7 @@ namespace API.Controllers
             return Ok(await uow.Repository<Product>().ListAsync(spec));
         }
 
+        [Cache(10000)]
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
         {
